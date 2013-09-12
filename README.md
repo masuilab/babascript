@@ -52,11 +52,21 @@ end
 
 ### switch BABA
 BabaScriptはジョブ通知に[Linda](https://gihtub.com/shokai/linda-base)を使っています。
-環境変数BABAのデフォルト値は"takumibaba"で、彼のジョブは http://linda.masuilab.org/takumibaba/notifications で確認できます。
 
-    % export BABA=shokai
+クエリーを書き込むタプルスペースのデフォルト値は"takumibaba"で、彼のジョブは http://linda.masuilab.org/takumibaba/notifications で確認できます。
 
-環境変数BABAを"shokai"に切り替えると、以後のジョブの通知先が http://linda.masuilab.org/shokai/notifications になります。
+    % baba --base http://example.com --space shokai
+
+タプルスペース名を"shokai"に、Lindaサーバーをexample.comに切り替えると、以後のジョブの通知先が http://example.com/shokai/notifications になります。
+
+
+ruby上での書き込み先の変更方法
+```ruby
+BabaScript.baba :base => "http://example.com", :space => "shokai" do
+  puts そろそろ起きたほうがいいのでは？
+end
+
+```
 
 
 Test
@@ -71,15 +81,19 @@ Test
 
 Start VM
 
-    % BABA=test bundle exec bin/baba-vm
+    % bundle exec bin/baba-vm --space test
 
 Run samples
 
-    % BABA=test bundle exec ruby samples/sample.rb
+    % bundle exec ruby samples/sample.rb
 
 ### Unit Test
 
     % bundle exec rake test
+
+or
+
+    % LINDA_BASE=http://localhost:5000 LINDA_SPACE=test bundle exec rake test
 
 
 Contributing

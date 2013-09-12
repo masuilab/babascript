@@ -6,9 +6,15 @@ $:.unshift File.expand_path '../lib', File.dirname(__FILE__)
 require 'babascript'
 
 args = ArgsParser.parse ARGV do
-  arg :e, "one line of script"
+  arg :eval, "evaluate one line script", :alias => :e
+  arg :base, "Linda-Base URL", :default => BabaScript::DEFAULTS[:base]
+  arg :space, "Linda-Space Name", :default => BabaScript::DEFAULTS[:space]
   arg :version, "show version", :alias => :v
   arg :help, "show help", :alias => :h
+
+  validate :base, "invalid URL" do |v|
+    v =~ /^https?:\/\/.+$/
+  end
 end
 
 binname = File.basename(__FILE__)
@@ -18,6 +24,7 @@ if args.has_option? :help
   STDERR.puts "e.g:"
   STDERR.puts " % #{binname} filename.bb"
   STDERR.puts " % #{binname} -e 'アイス買ってきてよ'"
+  STDERR.puts " % #{binname} filename.bb -base http://linda-base.example.com -space test"
   exit 1
 end
 
@@ -26,15 +33,16 @@ if args.has_option? :version
   exit 1
 end
 
-if args.has_param? :e
-  puts args[:e]
-  BabaScript.baba do
-    puts instance_eval args[:e]
+if args.has_param? :eval
+  puts args[:eval]
+  BabaScript.baba :base => args[:base], :space => args[:space] do
+    puts instance_eval args[:eval]
   end
 else
   args.argv.each do |fname|
     File.open(fname) do |f|
-      BabaScript::Baba.run f.read
+      baba = BabaScript::Baba.new(:base => args[:base], :space => args[:space])
+      baba.run f.read
     end
   end
 end

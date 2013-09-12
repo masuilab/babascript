@@ -6,8 +6,14 @@ $:.unshift File.expand_path '../lib', File.dirname(__FILE__)
 require 'babascript'
 
 args = ArgsParser.parse ARGV do
+  arg :base, "Linda-Base URL", :default => BabaScript::DEFAULTS[:base]
+  arg :space, "Linda-Space Name", :default => BabaScript::DEFAULTS[:space]
   arg :version, "show version", :alias => :v
   arg :help, "show help", :alias => :h
+
+  validate :base, "invalid URL" do |v|
+    v =~ /^https?:\/\/.+$/
+  end
 end
 
 binname = File.basename(__FILE__)
@@ -22,11 +28,11 @@ if args.has_option? :version
   exit 1
 end
 
-STDERR.puts "(connecting..)"
+STDERR.puts "(connecting to #{args[:base]}/#{args[:space]})"
 
 EM::run do
-  linda = EM::RocketIO::Linda::Client.new BabaScript.LINDA_BASE
-  ts = linda.tuplespace[ BabaScript.LINDA_SPACE ]
+  linda = EM::RocketIO::Linda::Client.new args[:base]
+  ts = linda.tuplespace[ args[:space] ]
 
   def take_task_and_run(ts)
     ts.take [:babascript, :eval] do |tuple|

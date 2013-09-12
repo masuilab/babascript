@@ -4,7 +4,7 @@ require 'rubygems'
 $:.unshift File.expand_path '../lib', File.dirname(__FILE__)
 require 'babascript'
 
-BabaScript.baba do
+BabaScript.baba :base => "http://localhost:5000", :space => "test" do
   if Time.now.hour < 12
     puts そろそろ起きたほうがいいのでは？
   else

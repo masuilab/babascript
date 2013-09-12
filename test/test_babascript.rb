@@ -3,14 +3,14 @@ require File.expand_path 'test_helper', File.dirname(__FILE__)
 
 class TestBabaScript < MiniTest::Test
 
-  ENV["BABA"] = "test"
-
   def test_eval_write_tuple
+    base = ENV["LINDA_BASE"] || BabaScript::DEFAULTS[:base]
+    space = ENV["LINDA_SPACE"] || BabaScript::DEFAULTS[:space]
     tuple_ = nil
     res_ = nil
     EM::run do
-      linda = EM::RocketIO::Linda::Client.new BabaScript.LINDA_BASE
-      ts = linda.tuplespace[ BabaScript.LINDA_SPACE ]
+      linda = EM::RocketIO::Linda::Client.new base
+      ts = linda.tuplespace[ space ]
       linda.io.once :connect do
         ts.take [:babascript, :eval] do |tuple|
           tuple_ = tuple
@@ -21,7 +21,7 @@ class TestBabaScript < MiniTest::Test
         end
       end
 
-      BabaScript.baba do
+      BabaScript.baba :base => base, :space => space do
         res_ = テスト 1, 2, "かずすけ"
       end
     end

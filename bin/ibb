@@ -6,10 +6,15 @@ require 'babascript'
 load "#{ENV['HOME']}/.ibbrc" if File.exists? "#{ENV['HOME']}/.ibbrc"
 
 args = ArgsParser.parse ARGV do
+  arg :base, "Linda-Base URL", :default => BabaScript::DEFAULTS[:base]
+  arg :space, "Linda-Space Name", :default => BabaScript::DEFAULTS[:space]
   arg :version, "show version", :alias => :v
   arg :help, "show help", :alias => :h
-end
 
+  validate :base, "invalid URL" do |v|
+    v =~ /^https?:\/\/.+$/
+  end
+end
 
 binname = File.basename(__FILE__)
 if args.has_option? :help
@@ -23,19 +28,21 @@ if args.has_option? :version
   exit 1
 end
 
-STDERR.puts "(connecting..)"
+STDERR.puts "(connecting to #{args[:base]}/#{args[:space]})"
 
 EM::run do
-  BabaScript::Baba.linda.io.on :connect do
+  baba = BabaScript::Baba.new :base => args[:base], :space => args[:space]
+
+  baba.linda.io.on :connect do
     STDERR.puts "(#{type} connect!)"
   end
 
-  BabaScript::Baba.linda.io.on :disconnect do
+  baba.linda.io.on :disconnect do
     STDERR.puts
     STDERR.puts "(#{type} closed)"
   end
 
-  BabaScript.baba do
+  baba.run do
     print "[IBB] > "
     while line = STDIN.gets do
       line.strip!
