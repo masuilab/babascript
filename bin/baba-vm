@@ -35,7 +35,7 @@ EM::run do
   ts = linda.tuplespace[ args[:space] ]
 
   def take_task_and_run(ts)
-    ts.take [:babascript, :eval] do |tuple|
+    ts.take [:babascript, :eval] do |tuple, info|
       loop do
         print %Q{#{tuple[2]}(#{tuple[3].join(', ')}) >}
         line = STDIN.gets.strip

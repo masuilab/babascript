@@ -42,7 +42,7 @@ module BabaScript
       ts = linda.tuplespace[@space]
       ts.write tuple
       if block_given?
-        ts.take [:babascript, :return, cid] do |result|
+        ts.take [:babascript, :return, cid] do |result, info|
           next if result.size < 4
           block.call result[3]
         end

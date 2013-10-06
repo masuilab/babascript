@@ -12,7 +12,7 @@ class TestBabaScript < MiniTest::Test
       linda = EM::RocketIO::Linda::Client.new base
       ts = linda.tuplespace[ space ]
       linda.io.once :connect do
-        ts.take [:babascript, :eval] do |tuple|
+        ts.take [:babascript, :eval] do |tuple, info|
           tuple_ = tuple
           ts.write [:babascript, :return, tuple[4]["callback"], "ざんまい"]
           EM::add_timer 1 do
